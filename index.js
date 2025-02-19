@@ -131,7 +131,25 @@ async function run() {
       res.send(result);
     });
 
-    
+    // get operation for registered users(secured)
+    app.get("/all-users", verifyToken, verifyAdmin, async (req, res) => {
+      const reqEmail = req.query.email;
+
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = 10;
+
+      const filter = { email: { $ne: reqEmail } };
+      const totalUsers = await userCollection.countDocuments(filter);
+      const cursor = userCollection
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize);
+
+      const users = await cursor.toArray();
+
+      res.send({ users, totalUsers });
+    });
 
     // get operation for user role
     app.get("/user-role", verifyToken, async (req, res) => {
@@ -363,11 +381,7 @@ async function run() {
     });
 
     // get operation for my campaigns(admin)
-    app.get(
-      "/all-campaign-data",
-      verifyToken,
-      verifyAdmin,
-      async (req, res) => {
+    app.get("/all-campaign-data",verifyToken, verifyAdmin, async (req, res) => {
         const email = req.query.email;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 6;
@@ -742,10 +756,7 @@ async function run() {
     );
 
     // patch api for changing the adopted status on accepting request
-    app.patch(
-      "/accept-request-change-adoptedStatus/:id",
-      verifyToken,
-      async (req, res) => {
+    app.patch("/accept-request-change-adoptedStatus/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const updatedAdoptedStatus = req.body;
 
@@ -764,10 +775,7 @@ async function run() {
     );
 
     // patch api for changing the adopted status on accepting request
-    app.patch(
-      "/accept-request-change-reqStatus-petCollection/:id",
-      verifyToken,
-      async (req, res) => {
+    app.patch("/accept-request-change-reqStatus-petCollection/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const updatedReqStatus = req.body;
 
@@ -786,10 +794,7 @@ async function run() {
     );
 
     // patch api for changing the request status
-    app.patch(
-      "/accept-request-change-reqStatus/:id",
-      verifyToken,
-      async (req, res) => {
+    app.patch("/accept-request-change-reqStatus/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const updatedRequestedStatus = req.body;
 
@@ -807,10 +812,7 @@ async function run() {
     );
 
     // patch api for changing the adopted status on accepting request
-    app.patch(
-      "/accept-request-change-adoptedStatus-requestedPets/:id",
-      verifyToken,
-      async (req, res) => {
+    app.patch("/accept-request-change-adoptedStatus-requestedPets/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const updatedAdoptedStatus = req.body;
 
@@ -829,10 +831,7 @@ async function run() {
     );
 
     // patch api for changing the request status on rejecting request in petCollection
-    app.patch(
-      "/reject-request-status-change/:id",
-      verifyToken,
-      async (req, res) => {
+    app.patch("/reject-request-status-change/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const updatedRequestedStatus = req.body;
 
@@ -897,10 +896,7 @@ async function run() {
     });
 
     // patch api for change the donated amount after refund
-    app.patch(
-      "/amount-change-for-refund/:id",
-      verifyToken,
-      async (req, res) => {
+    app.patch("/amount-change-for-refund/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const changedAmount = req.body;
 
@@ -935,11 +931,7 @@ async function run() {
     });
 
     // delete api for delete campaign (only for admin)
-    app.delete(
-      "/delete-campaign/:id",
-      verifyToken,
-      verifyAdmin,
-      async (req, res) => {
+    app.delete("/delete-campaign/:id", verifyToken, verifyAdmin, async (req, res) => {
         const id = req.params.id;
         const filter = { _id: new ObjectId(id) };
         const result = await donationCampaigns.deleteOne(filter);
@@ -948,10 +940,7 @@ async function run() {
     );
 
     // delete api for delete donation payment info
-    app.delete(
-      "/delete-payment-after-refund/:id",
-      verifyToken,
-      async (req, res) => {
+    app.delete("/delete-payment-after-refund/:id", verifyToken, async (req, res) => {
         const id = req.params.id;
         const filter = { transaction_id: id };
         const result = await donations.deleteOne(filter);
