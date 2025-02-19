@@ -272,29 +272,6 @@ async function run() {
     });
 
     // get operation for getting recommended donation campaign
-    // app.get('/recommended-donation/:id', async (req, res) => {
-    //     try {
-    //         const id = req.params.id;
-    //         const currentDate = new Date();
-
-    //         // Fetch campaigns
-    //         const campaigns = await donationCampaigns.find({
-    //             _id: { $ne: new ObjectId(id) },
-    //             lastDate: { $gte: currentDate.toISOString() },
-    //             isPaused: false,
-    //         }).limit(3).toArray();
-
-    //         const updatedCampaigns = campaigns.map(campaign => ({
-    //             ...campaign,
-    //             expired: new Date(campaign.lastDate) < currentDate
-    //         }));
-
-    //         res.send(updatedCampaigns);
-    //     } catch (error) {
-    //         console.error("Error fetching recommended donations:", error);
-    //         res.status(500).send({ message: "Error fetching recommended donations" });
-    //     }
-    // });
     app.get("/recommended-donation/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -730,12 +707,10 @@ async function run() {
           { new: false, upsert: false }
         );
 
-        res
-          .status(200)
-          .json({
-            message: "User updated with role 'Admin'",
-            updatedUserRole: true,
-          });
+        res.status(200).json({
+          message: "User updated with role 'Admin'",
+          updatedUserRole: true,
+        });
       } catch (error) {
         console.error("Error Making Admin", error);
         res.status(500).json({ message: "Something went wrong", error });
