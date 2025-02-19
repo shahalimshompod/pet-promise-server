@@ -37,7 +37,7 @@ async function run() {
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "3h",
       });
       res.send({ token });
     });
@@ -287,7 +287,7 @@ async function run() {
                 isPaused: false,
               },
             },
-            { $sample: { size: 3 } }, // Randomly select 3 campaigns
+            { $sample: { size: 3 } },
           ])
           .toArray();
 
@@ -977,13 +977,12 @@ async function run() {
       }
     );
   } finally {
-    // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
 run().catch(console.dir);
 
-app.get("/", (req, res) => {
+app.get("/", (res) => {
   res.send("petpromise is running");
 });
 
