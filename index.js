@@ -87,7 +87,7 @@ async function run() {
 
       // Search by pet name if provided
       if (searchQuery) {
-        filter.pet_name = { $regex: searchQuery, $options: "i" }; // Case-insensitive regex search
+        filter.pet_name = { $regex: searchQuery, $options: "i" };
       }
 
       // Convert page and limit to numbers
@@ -131,25 +131,7 @@ async function run() {
       res.send(result);
     });
 
-    // get operation for registered users(secured)
-    app.get("/all-users", verifyToken, verifyAdmin, async (req, res) => {
-      const reqEmail = req.query.email;
-
-      const page = parseInt(req.query.page) || 1;
-      const pageSize = 10;
-
-      const filter = { email: { $ne: reqEmail } };
-      const totalUsers = await userCollection.countDocuments(filter);
-      const cursor = userCollection
-        .find(filter)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * pageSize)
-        .limit(pageSize);
-
-      const users = await cursor.toArray();
-
-      res.send({ users, totalUsers });
-    });
+    
 
     // get operation for user role
     app.get("/user-role", verifyToken, async (req, res) => {
